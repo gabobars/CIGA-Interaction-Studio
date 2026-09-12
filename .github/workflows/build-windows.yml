@@ -26,43 +26,31 @@ jobs:
       # ============================================================
 
       - name: Setup Godot
-        uses: solarlabyrinth/action-setup-godot@v3
+        uses: lihop/setup-godot@v3
         with:
           version: 4.7.2-stable
-          csharp: false
           export-templates: true
-          name: godot
+          cache: true
 
 
       # ============================================================
-      # PREPARE BUILD DIRECTORY
+      # VERIFY GODOT
       # ============================================================
 
-      - name: Prepare build directory
-        shell: powershell
-        run: |
-          if (Test-Path "build") {
-            Remove-Item "build" -Recurse -Force
-          }
-
-          New-Item `
-            -ItemType Directory `
-            -Force `
-            -Path "build" |
-            Out-Null
-
-
-      # ============================================================
-      # IMPORT / VERIFY PROJECT
-      # ============================================================
-
-      - name: Import Godot project
+      - name: Verify Godot
         shell: powershell
         run: |
           Write-Host "Godot version:"
           godot --version
 
-          Write-Host ""
+
+      # ============================================================
+      # IMPORT PROJECT
+      # ============================================================
+
+      - name: Import Godot project
+        shell: powershell
+        run: |
           Write-Host "Importing CIGA project..."
 
           godot `
@@ -75,6 +63,27 @@ jobs:
             Write-Error "Godot project import failed."
             exit $LASTEXITCODE
           }
+
+
+      # ============================================================
+      # PREPARE BUILD DIRECTORY
+      # ============================================================
+
+      - name: Prepare build directory
+        shell: powershell
+        run: |
+          if (Test-Path "build") {
+            Remove-Item `
+              "build" `
+              -Recurse `
+              -Force
+          }
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            -Path "build" |
+            Out-Null
 
 
       # ============================================================
@@ -147,7 +156,9 @@ jobs:
             Select-Object FullName, Length
 
           Write-Host ""
-          Write-Host "Executable files:"
+          Write-Host "========================================"
+          Write-Host "EXE / PCK FILES"
+          Write-Host "========================================"
 
           $outputs = Get-ChildItem `
             -Path "build" `
@@ -165,7 +176,7 @@ jobs:
 
 
       # ============================================================
-      # UPLOAD BUILD ARTIFACT
+      # UPLOAD BUILD
       # ============================================================
 
       - name: Upload build
