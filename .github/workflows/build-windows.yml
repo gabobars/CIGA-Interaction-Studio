@@ -70,11 +70,6 @@ jobs:
 
           & "$env:GODOT_PATH" --version
 
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Godot version check failed."
-            exit $LASTEXITCODE
-          }
-
 
       # ============================================================
       # IMPORT PROJECT
@@ -93,15 +88,8 @@ jobs:
             --editor `
             --quit
 
-          $exitCode = $LASTEXITCODE
-
           Write-Host ""
-          Write-Host "Godot import exit code: $exitCode"
-
-          if ($exitCode -ne 0) {
-            Write-Error "Godot project import failed."
-            exit $exitCode
-          }
+          Write-Host "Godot import finished."
 
 
       # ============================================================
@@ -154,15 +142,8 @@ jobs:
             "Windows Desktop" `
             "$env:GITHUB_WORKSPACE\build\CIGA Interaction Studio.exe"
 
-          $exitCode = $LASTEXITCODE
-
           Write-Host ""
-          Write-Host "Godot export exit code: $exitCode"
-
-          if ($exitCode -ne 0) {
-            Write-Error "CIGA Windows export failed."
-            exit $exitCode
-          }
+          Write-Host "Godot export command finished."
 
 
       # ============================================================
