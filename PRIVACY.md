@@ -100,7 +100,7 @@ Users are responsible for:
 - Avoiding the public sharing of CIGA profile files containing sensitive information
 - Reviewing the privacy practices of external services they connect to CIGA
 - Configuring integrations according to their own privacy and community requirements
-- Ensuring that content submitted through live event features is appropriate for their intended environment
+- Ensuring that content submitted through live event features is appropriate for their intended environment.
 
 ## 11. Children's Privacy
 
