@@ -24,3 +24,7 @@ See the [LICENSE](LICENSE) file for the full license text.
 ## Code signing policy
 
 See [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md) for the project's code signing policy.
+
+## Privacy
+
+See [PRIVACY.md](PRIVACY.md) for the project's privacy policy.
