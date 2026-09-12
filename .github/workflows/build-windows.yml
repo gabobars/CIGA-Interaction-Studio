@@ -72,7 +72,157 @@ jobs:
 
 
       # ============================================================
-      # IMPORT PROJECT
+      # DOWNLOAD EXPORT TEMPLATES
+      # ============================================================
+
+      - name: Download Godot export templates
+        shell: powershell
+        run: |
+          $templatesTpz = "$env:TEMP\godot-export-templates.tpz"
+
+          $templatesUrl = `
+            "https://github.com/godotengine/godot-builds/releases/download/4.7.2-stable/Godot_v4.7.2-stable_export_templates.tpz"
+
+          Write-Host "Downloading Godot 4.7.2 export templates..."
+
+          Invoke-WebRequest `
+            -Uri $templatesUrl `
+            -OutFile $templatesTpz
+
+          if (!(Test-Path $templatesTpz)) {
+            Write-Error "Export templates download failed."
+            exit 1
+          }
+
+          Write-Host "Export templates downloaded."
+
+
+      # ============================================================
+      # INSTALL EXPORT TEMPLATES
+      # ============================================================
+
+      - name: Install Godot export templates
+        shell: powershell
+        run: |
+          $templatesTpz = "$env:TEMP\godot-export-templates.tpz"
+
+          $godotEditorData = `
+            Join-Path $env:APPDATA "Godot"
+
+          $templatesDirectory = `
+            Join-Path $godotEditorData "export_templates\4.7.2.stable"
+
+          if (Test-Path $templatesDirectory) {
+            Remove-Item `
+              $templatesDirectory `
+              -Recurse `
+              -Force
+          }
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            -Path $templatesDirectory |
+            Out-Null
+
+          Write-Host "Installing templates to:"
+          Write-Host $templatesDirectory
+
+          $extractDirectory = "$env:TEMP\godot-template-extract"
+
+          if (Test-Path $extractDirectory) {
+            Remove-Item `
+              $extractDirectory `
+              -Recurse `
+              -Force
+          }
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            -Path $extractDirectory |
+            Out-Null
+
+          tar `
+            -xf $templatesTpz `
+            -C $extractDirectory
+
+          Write-Host "Extracted template contents:"
+
+          Get-ChildItem `
+            -Path $extractDirectory `
+            -Recurse `
+            -Force |
+            Select-Object FullName, Length
+
+          $innerTemplateDirectory = `
+            Join-Path $extractDirectory "templates"
+
+          if (Test-Path $innerTemplateDirectory) {
+
+            Copy-Item `
+              -Path "$innerTemplateDirectory\*" `
+              -Destination $templatesDirectory `
+              -Recurse `
+              -Force
+
+          } else {
+
+            Copy-Item `
+              -Path "$extractDirectory\*" `
+              -Destination $templatesDirectory `
+              -Recurse `
+              -Force
+          }
+
+          Write-Host "Installed export templates:"
+
+          Get-ChildItem `
+            -Path $templatesDirectory `
+            -Recurse `
+            -Force |
+            Select-Object FullName, Length
+
+
+      # ============================================================
+      # VERIFY EXPORT TEMPLATE
+      # ============================================================
+
+      - name: Verify Windows export template
+        shell: powershell
+        run: |
+          $templatesDirectory = `
+            Join-Path $env:APPDATA "Godot\export_templates\4.7.2.stable"
+
+          $windowsTemplate = `
+            Join-Path `
+              $templatesDirectory `
+              "windows_release_x86_64.exe"
+
+          if (!(Test-Path $windowsTemplate)) {
+
+            Write-Host "Installed template directory:"
+            
+            if (Test-Path $templatesDirectory) {
+              Get-ChildItem `
+                -Path $templatesDirectory `
+                -Recurse `
+                -Force |
+                Select-Object FullName, Length
+            }
+
+            Write-Error `
+              "Windows x86_64 release export template was not found."
+
+            exit 1
+          }
+
+          Write-Host "Windows export template found:"
+          Write-Host $windowsTemplate
+
+
+      # ============================================================
+      # IMPORT GODOT PROJECT
       # ============================================================
 
       - name: Import Godot project
@@ -96,14 +246,17 @@ jobs:
 
 
       # ============================================================
-      # CREATE BUILD DIRECTORY
+      # PREPARE BUILD DIRECTORY
       # ============================================================
 
       - name: Prepare build directory
         shell: powershell
         run: |
           if (Test-Path "build") {
-            Remove-Item "build" -Recurse -Force
+            Remove-Item `
+              "build" `
+              -Recurse `
+              -Force
           }
 
           New-Item `
@@ -114,7 +267,7 @@ jobs:
 
 
       # ============================================================
-      # WINDOWS EXPORT
+      # BUILD WINDOWS
       # ============================================================
 
       - name: Build Windows
@@ -139,7 +292,8 @@ jobs:
           & "$env:GODOT_PATH" `
             --headless `
             --path "$PWD" `
-            --export-release "Windows Desktop" `
+            --export-release `
+            "Windows Desktop" `
             "$PWD\build\CIGA Interaction Studio.exe"
 
           $exitCode = $LASTEXITCODE
@@ -165,31 +319,29 @@ jobs:
           Write-Host "BUILD DIRECTORY"
           Write-Host "========================================"
 
-          if (Test-Path "build") {
-
-            $files = Get-ChildItem `
-              -Path "build" `
-              -Recurse `
-              -Force
-
-            if ($files.Count -eq 0) {
-              Write-Error "Build directory exists but contains no files."
-              exit 1
-            }
-
-            $files |
-              Select-Object FullName, Length
-
-          } else {
-
+          if (!(Test-Path "build")) {
             Write-Error "Build directory does not exist."
             exit 1
           }
 
+          $files = Get-ChildItem `
+            -Path "build" `
+            -Recurse `
+            -Force
+
+          if ($files.Count -eq 0) {
+            Write-Error `
+              "Build directory exists but contains no files."
+
+            exit 1
+          }
+
+          $files |
+            Select-Object FullName, Length
 
           Write-Host ""
           Write-Host "========================================"
-          Write-Host "ALL EXE / PCK FILES IN WORKSPACE"
+          Write-Host "EXE / PCK FILES"
           Write-Host "========================================"
 
           $outputs = Get-ChildItem `
@@ -200,7 +352,9 @@ jobs:
             -ErrorAction SilentlyContinue
 
           if ($outputs.Count -eq 0) {
-            Write-Error "No .exe or .pck files were found anywhere in the workspace."
+            Write-Error `
+              "No .exe or .pck files were found."
+
             exit 1
           }
 
