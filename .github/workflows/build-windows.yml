@@ -37,7 +37,22 @@ jobs:
             --path "." `
             --export-release "Windows Desktop" `
             "build/CIGA Interaction Studio.exe"
+      - name: Inspect build output
+        shell: powershell
+        run: |
+          Write-Host "=== BUILD DIRECTORY ==="
 
+          if (Test-Path "build") {
+            Get-ChildItem -Path "build" -Recurse -Force |
+              Select-Object FullName, Length
+          } else {
+            Write-Host "BUILD DIRECTORY DOES NOT EXIST"
+          }
+
+          Write-Host "=== ENTIRE WORKSPACE EXECUTABLES ==="
+
+          Get-ChildItem -Path "." -Recurse -Force -Include *.exe,*.pck |
+            Select-Object FullName, Length
       - name: Upload build
         uses: actions/upload-artifact@v4
         with:
