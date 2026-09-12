@@ -129,7 +129,7 @@ jobs:
 
           Write-Host ""
           Write-Host "Preset:"
-          Write-Host "Windows Desktop"
+          Write-Host "CIGA Interaction Studio.exe"
 
           Write-Host ""
           Write-Host "Output:"
@@ -139,7 +139,7 @@ jobs:
             --headless `
             --path "$env:GITHUB_WORKSPACE" `
             --export-release `
-            "Windows Desktop" `
+            "CIGA Interaction Studio.exe" `
             "$env:GITHUB_WORKSPACE\build\CIGA Interaction Studio.exe"
 
           Write-Host ""
