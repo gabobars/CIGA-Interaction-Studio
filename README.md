@@ -2,14 +2,16 @@
 
 CIGA Interaction Studio is an open-source desktop application built with Godot for interactive VTuber, streaming, and external output workflows.
 
+Developed and directed by **gabobars**.
+
 ## Features
 
-- VRM / 3D interaction workflows
-- VMC output
-- VTube Studio output
-- StreamElements integration
-- CIGAIS Worker integration
-- Configurable interaction and event systems
+* VRM / 3D interaction workflows
+* VMC output
+* VTube Studio output
+* StreamElements integration
+* CIGAIS Worker integration
+* Configurable interaction and event systems
 
 ## Download
 
@@ -21,10 +23,10 @@ CIGA Interaction Studio is free and open-source software licensed under the GNU 
 
 See the [LICENSE](LICENSE) file for the full license text.
 
-## Code signing policy
-
-See [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md) for the project's code signing policy.
-
 ## Privacy
 
 See [PRIVACY.md](PRIVACY.md) for the project's privacy policy.
+
+## Code signing policy
+
+See [CODE_SIGNING_POLICY.md](CODE_SIGNING_POLICY.md) for the project's code signing policy.
