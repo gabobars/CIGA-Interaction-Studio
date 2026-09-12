@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download Godot 4.7.2
         shell: powershell
@@ -54,7 +54,7 @@ jobs:
           Get-ChildItem -Path "." -Recurse -Force -Include *.exe,*.pck |
             Select-Object FullName, Length
       - name: Upload build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: CIGA-Interaction-Studio-Windows
           path: |
