@@ -14,9 +14,9 @@ gabobars
 
 ## Privacy policy
 
-This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.
+See [PRIVACY.md](PRIVACY.md) for the project's privacy policy.
 
-CIGA Interaction Studio may connect to external services when the user explicitly configures or enables those integrations, including StreamElements, VTube Studio, and CIGAIS services.
+The program may connect to external services when the user explicitly configures or enables integrations, including StreamElements, VTube Studio, and CIGAIS services.
 
 ## Signing scope
 
