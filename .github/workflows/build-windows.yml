@@ -1,1 +1,47 @@
+name: Build Windows
 
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Godot 4.7.2
+        shell: powershell
+        run: |
+          Invoke-WebRequest `
+            -Uri "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_win64.exe.zip" `
+            -OutFile "$env:TEMP\godot.zip"
+
+          Expand-Archive `
+            -Path "$env:TEMP\godot.zip" `
+            -DestinationPath "$env:TEMP\godot"
+
+      - name: Build Windows
+        shell: powershell
+        run: |
+          $godot = Get-ChildItem "$env:TEMP\godot" -Filter "Godot_v4.7.2-stable_win64.exe" -Recurse | Select-Object -First 1
+
+          New-Item -ItemType Directory -Force -Path "build" | Out-Null
+
+          & $godot.FullName `
+            --headless `
+            --path "." `
+            --export-release "Windows Desktop" `
+            "build/CIGA Interaction Studio.exe"
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: CIGA-Interaction-Studio-Windows
+          path: |
+            build/CIGA Interaction Studio.exe
+            build/CIGA Interaction Studio.pck
