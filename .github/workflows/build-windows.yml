@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 jobs:
@@ -11,52 +12,209 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      # ============================================================
+      # CHECKOUT
+      # ============================================================
+
       - name: Checkout
         uses: actions/checkout@v5
+
+
+      # ============================================================
+      # DOWNLOAD GODOT 4.7.2
+      # ============================================================
 
       - name: Download Godot 4.7.2
         shell: powershell
         run: |
+          $godotZip = "$env:TEMP\godot.zip"
+          $godotDir = "$env:TEMP\godot"
+
           Invoke-WebRequest `
             -Uri "https://github.com/godotengine/godot/releases/download/4.7.2-stable/Godot_v4.7.2-stable_win64.exe.zip" `
-            -OutFile "$env:TEMP\godot.zip"
+            -OutFile $godotZip
+
+          if (Test-Path $godotDir) {
+            Remove-Item $godotDir -Recurse -Force
+          }
 
           Expand-Archive `
-            -Path "$env:TEMP\godot.zip" `
-            -DestinationPath "$env:TEMP\godot"
+            -Path $godotZip `
+            -DestinationPath $godotDir `
+            -Force
+
+
+      # ============================================================
+      # FIND GODOT
+      # ============================================================
+
+      - name: Find Godot
+        shell: powershell
+        run: |
+          $godot = Get-ChildItem `
+            "$env:TEMP\godot" `
+            -Filter "Godot_v4.7.2-stable_win64.exe" `
+            -Recurse |
+            Select-Object -First 1
+
+          if ($null -eq $godot) {
+            Write-Error "Godot 4.7.2 executable not found."
+            exit 1
+          }
+
+          Write-Host "Godot found:"
+          Write-Host $godot.FullName
+
+          "GODOT_PATH=$($godot.FullName)" | Out-File `
+            -FilePath $env:GITHUB_ENV `
+            -Encoding utf8 `
+            -Append
+
+
+      # ============================================================
+      # IMPORT PROJECT
+      # ============================================================
+
+      - name: Import Godot project
+        shell: powershell
+        run: |
+          Write-Host "Importing Godot project..."
+
+          & "$env:GODOT_PATH" `
+            --headless `
+            --path "$PWD" `
+            --editor `
+            --quit
+
+          $exitCode = $LASTEXITCODE
+
+          Write-Host "Godot import exit code: $exitCode"
+
+          if ($exitCode -ne 0) {
+            exit $exitCode
+          }
+
+
+      # ============================================================
+      # CREATE BUILD DIRECTORY
+      # ============================================================
+
+      - name: Prepare build directory
+        shell: powershell
+        run: |
+          if (Test-Path "build") {
+            Remove-Item "build" -Recurse -Force
+          }
+
+          New-Item `
+            -ItemType Directory `
+            -Force `
+            -Path "build" |
+            Out-Null
+
+
+      # ============================================================
+      # WINDOWS EXPORT
+      # ============================================================
 
       - name: Build Windows
         shell: powershell
         run: |
-          $godot = Get-ChildItem "$env:TEMP\godot" -Filter "Godot_v4.7.2-stable_win64.exe" -Recurse | Select-Object -First 1
+          Write-Host "========================================"
+          Write-Host "Starting CIGA Windows export"
+          Write-Host "========================================"
 
-          New-Item -ItemType Directory -Force -Path "build" | Out-Null
+          Write-Host "Godot:"
+          Write-Host "$env:GODOT_PATH"
 
-          & $godot.FullName `
+          Write-Host "Project:"
+          Write-Host "$PWD"
+
+          Write-Host "Preset:"
+          Write-Host "Windows Desktop"
+
+          Write-Host "Output:"
+          Write-Host "$PWD\build\CIGA Interaction Studio.exe"
+
+          & "$env:GODOT_PATH" `
             --headless `
-            --path "." `
+            --path "$PWD" `
             --export-release "Windows Desktop" `
-            "build/CIGA Interaction Studio.exe"
+            "$PWD\build\CIGA Interaction Studio.exe"
+
+          $exitCode = $LASTEXITCODE
+
+          Write-Host "========================================"
+          Write-Host "Godot exit code: $exitCode"
+          Write-Host "========================================"
+
+          if ($exitCode -ne 0) {
+            Write-Error "Godot Windows export failed."
+            exit $exitCode
+          }
+
+
+      # ============================================================
+      # INSPECT BUILD OUTPUT
+      # ============================================================
+
       - name: Inspect build output
         shell: powershell
         run: |
-          Write-Host "=== BUILD DIRECTORY ==="
+          Write-Host "========================================"
+          Write-Host "BUILD DIRECTORY"
+          Write-Host "========================================"
 
           if (Test-Path "build") {
-            Get-ChildItem -Path "build" -Recurse -Force |
+
+            $files = Get-ChildItem `
+              -Path "build" `
+              -Recurse `
+              -Force
+
+            if ($files.Count -eq 0) {
+              Write-Error "Build directory exists but contains no files."
+              exit 1
+            }
+
+            $files |
               Select-Object FullName, Length
+
           } else {
-            Write-Host "BUILD DIRECTORY DOES NOT EXIST"
+
+            Write-Error "Build directory does not exist."
+            exit 1
           }
 
-          Write-Host "=== ENTIRE WORKSPACE EXECUTABLES ==="
 
-          Get-ChildItem -Path "." -Recurse -Force -Include *.exe,*.pck |
+          Write-Host ""
+          Write-Host "========================================"
+          Write-Host "ALL EXE / PCK FILES IN WORKSPACE"
+          Write-Host "========================================"
+
+          $outputs = Get-ChildItem `
+            -Path "." `
+            -Recurse `
+            -Force `
+            -Include *.exe,*.pck `
+            -ErrorAction SilentlyContinue
+
+          if ($outputs.Count -eq 0) {
+            Write-Error "No .exe or .pck files were found anywhere in the workspace."
+            exit 1
+          }
+
+          $outputs |
             Select-Object FullName, Length
+
+
+      # ============================================================
+      # UPLOAD ARTIFACT
+      # ============================================================
+
       - name: Upload build
         uses: actions/upload-artifact@v5
         with:
           name: CIGA-Interaction-Studio-Windows
-          path: |
-            build/CIGA Interaction Studio.exe
-            build/CIGA Interaction Studio.pck
+          path: build/
+          if-no-files-found: error
