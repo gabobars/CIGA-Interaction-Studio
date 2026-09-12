@@ -34,34 +34,73 @@ jobs:
 
 
       # ============================================================
+      # DEFINE GODOT PATH
+      # ============================================================
+
+      - name: Define Godot path
+        shell: powershell
+        run: |
+          $godotPath = Join-Path `
+            $env:GITHUB_WORKSPACE `
+            "v4.7.2-stable\Godot_v4.7.2-stable_win64.exe"
+
+          Write-Host "Godot path:"
+          Write-Host $godotPath
+
+          if (!(Test-Path $godotPath)) {
+            Write-Error "Godot executable was not found."
+            exit 1
+          }
+
+          "GODOT_PATH=$godotPath" | Out-File `
+            -FilePath $env:GITHUB_ENV `
+            -Encoding utf8 `
+            -Append
+
+
+      # ============================================================
       # VERIFY GODOT
       # ============================================================
 
       - name: Verify Godot
         shell: powershell
         run: |
-          Write-Host "Godot version:"
-          godot --version
+          Write-Host "Godot executable:"
+          Write-Host "$env:GODOT_PATH"
+
+          & "$env:GODOT_PATH" --version
+
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Godot version check failed."
+            exit $LASTEXITCODE
+          }
 
 
       # ============================================================
       # IMPORT PROJECT
       # ============================================================
 
-      - name: Import Godot project
+      - name: Import CIGA project
         shell: powershell
         run: |
-          Write-Host "Importing CIGA project..."
+          Write-Host "========================================"
+          Write-Host "IMPORTING CIGA PROJECT"
+          Write-Host "========================================"
 
-          godot `
+          & "$env:GODOT_PATH" `
             --headless `
-            --path "$PWD" `
+            --path "$env:GITHUB_WORKSPACE" `
             --editor `
             --quit
 
-          if ($LASTEXITCODE -ne 0) {
+          $exitCode = $LASTEXITCODE
+
+          Write-Host ""
+          Write-Host "Godot import exit code: $exitCode"
+
+          if ($exitCode -ne 0) {
             Write-Error "Godot project import failed."
-            exit $LASTEXITCODE
+            exit $exitCode
           }
 
 
@@ -98,7 +137,7 @@ jobs:
           Write-Host "========================================"
 
           Write-Host "Godot:"
-          godot --version
+          Write-Host "$env:GODOT_PATH"
 
           Write-Host ""
           Write-Host "Preset:"
@@ -106,19 +145,19 @@ jobs:
 
           Write-Host ""
           Write-Host "Output:"
-          Write-Host "$PWD\build\CIGA Interaction Studio.exe"
+          Write-Host "$env:GITHUB_WORKSPACE\build\CIGA Interaction Studio.exe"
 
-          godot `
+          & "$env:GODOT_PATH" `
             --headless `
-            --path "$PWD" `
+            --path "$env:GITHUB_WORKSPACE" `
             --export-release `
             "Windows Desktop" `
-            "$PWD\build\CIGA Interaction Studio.exe"
+            "$env:GITHUB_WORKSPACE\build\CIGA Interaction Studio.exe"
 
           $exitCode = $LASTEXITCODE
 
           Write-Host ""
-          Write-Host "Godot exit code: $exitCode"
+          Write-Host "Godot export exit code: $exitCode"
 
           if ($exitCode -ne 0) {
             Write-Error "CIGA Windows export failed."
@@ -127,7 +166,7 @@ jobs:
 
 
       # ============================================================
-      # INSPECT BUILD
+      # INSPECT BUILD OUTPUT
       # ============================================================
 
       - name: Inspect build output
