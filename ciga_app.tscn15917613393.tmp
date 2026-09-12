@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://cpwsi1025sh46"]
+
+[ext_resource type="Script" uid="uid://b6l4fbnsu74ld" path="res://scripts/app/app_controller.gd" id="1_q65s3"]
+
+[node name="CIGAApp" type="Node" unique_id=1617385601]
+
+[node name="AppController" type="Node" parent="." unique_id=927476533]
+script = ExtResource("1_q65s3")

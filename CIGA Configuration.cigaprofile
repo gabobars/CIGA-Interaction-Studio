@@ -1,0 +1,169 @@
+{
+	"format": "CIGA_PROFILE",
+	"profile": {
+		"camera": {
+			"flipped": false,
+			"fov": 40.0,
+			"x": 0.0,
+			"y": 1.4,
+			"z": 4.0
+		},
+		"character": {
+			"avatar_mappings": {},
+			"bone_map": {},
+			"enabled_hitpoints": [
+				"HeadHitPoint",
+				"ChestHitPoint",
+				"LeftShoulderHitPoint",
+				"RightShoulderHitPoint",
+				"LeftArmHitPoint",
+				"RightArmHitPoint"
+			],
+			"load_on_launch": false,
+			"mapped": false
+		},
+		"character_id": "",
+		"events": {
+			"BIT": {
+				"actions": [
+					{
+						"amount": 1,
+						"amount_max": 1,
+						"amount_min": 1,
+						"amount_mode": "FIXED",
+						"force": 1.8,
+						"force_mode": "INHERIT",
+						"object_id": "",
+						"object_mode": "RANDOM_FROM_ALL",
+						"selected_object_ids": [],
+						"selected_targets": [],
+						"speed": 5.4,
+						"speed_mode": "INHERIT",
+						"target": "CHEST",
+						"target_mode": "RANDOM_FROM_ALL"
+					}
+				],
+				"enabled": true,
+				"reward_name": "",
+				"trigger_event": "BIT"
+			},
+			"FOLLOW": {
+				"actions": [
+					{
+						"amount": 1,
+						"amount_max": 1,
+						"amount_min": 1,
+						"amount_mode": "FIXED",
+						"force": 1.8,
+						"force_mode": "INHERIT",
+						"object_id": "",
+						"object_mode": "RANDOM_FROM_ALL",
+						"selected_object_ids": [],
+						"selected_targets": [],
+						"speed": 5.4,
+						"speed_mode": "INHERIT",
+						"target": "CHEST",
+						"target_mode": "RANDOM_FROM_ALL"
+					}
+				],
+				"enabled": true,
+				"reward_name": "",
+				"trigger_event": "FOLLOW"
+			},
+			"RAID": {
+				"actions": [
+					{
+						"amount": 1,
+						"amount_max": 1,
+						"amount_min": 1,
+						"amount_mode": "FIXED",
+						"force": 1.8,
+						"force_mode": "INHERIT",
+						"object_id": "",
+						"object_mode": "RANDOM_FROM_ALL",
+						"selected_object_ids": [],
+						"selected_targets": [],
+						"speed": 5.4,
+						"speed_mode": "INHERIT",
+						"target": "CHEST",
+						"target_mode": "RANDOM_FROM_ALL"
+					}
+				],
+				"enabled": true,
+				"reward_name": "",
+				"trigger_event": "RAID"
+			},
+			"SUBSCRIBE": {
+				"actions": [
+					{
+						"amount": 1,
+						"amount_max": 1,
+						"amount_min": 1,
+						"amount_mode": "FIXED",
+						"force": 1.8,
+						"force_mode": "INHERIT",
+						"object_id": "",
+						"object_mode": "RANDOM_FROM_ALL",
+						"selected_object_ids": [],
+						"selected_targets": [],
+						"speed": 5.4,
+						"speed_mode": "INHERIT",
+						"target": "CHEST",
+						"target_mode": "RANDOM_FROM_ALL"
+					}
+				],
+				"enabled": true,
+				"reward_name": "",
+				"trigger_event": "SUBSCRIBE"
+			},
+			"_ciga_defaults_initialized": true
+		},
+		"id": "profile_current",
+		"interaction": {
+			"amount": 1,
+			"force": 1.8,
+			"object_id": "",
+			"object_scales": {},
+			"random_object": false,
+			"random_target": false,
+			"scale": 1.0,
+			"spawn": "CENTER",
+			"speed": 5.4,
+			"target": "CHEST"
+		},
+		"last_page": "PROFILES",
+		"name": "CIGA Configuration",
+		"objects": {
+			"scale_multipliers": {},
+			"scales": {},
+			"selected_object_id": ""
+		},
+		"output": {
+			"mode": "internal"
+		},
+		"settings": {
+			"default_bounce": 0.2,
+			"default_force": 1.8,
+			"default_speed": 5.4,
+			"default_spin": 0.0,
+			"max_objects": 50,
+			"object_lifetime": 5.0,
+			"streamer_mode": false,
+			"ui_mode": "dark"
+		},
+		"viewport": {
+			"edge_bottom_center": true,
+			"edge_left_bottom": true,
+			"edge_left_top": true,
+			"edge_right_bottom": true,
+			"edge_right_top": true,
+			"edge_top_center": true,
+			"height": 1080,
+			"impact_orientation_flipped": false,
+			"streamer_mode": false,
+			"width": 1920,
+			"window_mode": "windowed"
+		}
+	},
+	"version": 1
+}
