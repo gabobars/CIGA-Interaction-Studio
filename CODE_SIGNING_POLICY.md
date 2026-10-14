@@ -1,4 +1,4 @@
-# Code signing policy
+# Code signing policy (REJECTED AT THIS TIME, WITH POSSIBILITY TO ENTER BASED ON PROJECT'S RELATIVITY WITH THE COMMUNITIE)
 
 Free code signing provided by SignPath.io, certificate by SignPath Foundation.
 
